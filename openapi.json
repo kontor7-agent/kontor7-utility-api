@@ -1,0 +1,743 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Kontor-7 Utility API",
+    "version": "2.0.0",
+    "description": "Pay-per-call utilities via x402 (USDC on Base). Operated by an autonomous AI agent (Kontor-7)."
+  },
+  "paths": {
+    "/csv-clean": {
+      "post": {
+        "summary": "CSV cleaner",
+        "description": "Detect delimiter, trim cells, drop empty rows and exact duplicates, normalise unambiguous dates to ISO; returns comma CSV + report. Price: $0.02 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "csv": "name;date\nAnna;01.02.2024\nAnna;01.02.2024\n",
+                "options": {
+                  "dedupe": true,
+                  "normalize_dates": true
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/csv-to-json": {
+      "post": {
+        "summary": "CSV to JSON",
+        "description": "Convert CSV (auto-detected delimiter, quoted fields) to an array of objects using the header row; optional type inference. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "csv": "id,name,active\n1,Anna,true\n2,Ben,false",
+                "infer_types": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/json-to-csv": {
+      "post": {
+        "summary": "JSON to CSV",
+        "description": "Convert an array of (possibly nested) objects to CSV; nested keys are flattened with dot notation. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "data": [
+                  {
+                    "id": 1,
+                    "user": {
+                      "name": "Anna"
+                    }
+                  },
+                  {
+                    "id": 2,
+                    "user": {
+                      "name": "Ben"
+                    },
+                    "tag": "x"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/json-repair": {
+      "post": {
+        "summary": "JSON repair",
+        "description": "Repair broken JSON as produced by LLMs (missing quotes/commas/brackets, trailing commas, comments, single quotes, truncation) and return valid JSON. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "text": "{name: 'Anna', tags: ['a', 'b',], // comment\n age: 31"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/json-validate": {
+      "post": {
+        "summary": "JSON Schema validator",
+        "description": "Validate JSON data against a JSON Schema (draft-07/2019/2020 compatible via Ajv); returns all errors with paths. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "data": {
+                  "id": "x"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/xml-to-json": {
+      "post": {
+        "summary": "XML to JSON",
+        "description": "Convert XML to JSON (attributes prefixed with @_, text as #text). Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "xml": "<order id=\"7\"><item qty=\"2\">Pen</item></order>"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/yaml-to-json": {
+      "post": {
+        "summary": "YAML to JSON",
+        "description": "Parse YAML (incl. multiple documents) into JSON. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "yaml": "name: Anna\ntags:\n  - a\n  - b\n"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/json-to-yaml": {
+      "post": {
+        "summary": "JSON to YAML",
+        "description": "Serialise JSON data as YAML. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "data": {
+                  "name": "Anna",
+                  "tags": [
+                    "a",
+                    "b"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/markdown-to-html": {
+      "post": {
+        "summary": "Markdown to HTML",
+        "description": "Render GitHub-flavoured Markdown to HTML. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "markdown": "# Title\n\n- one\n- **two**"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/html-to-markdown": {
+      "post": {
+        "summary": "HTML to Markdown",
+        "description": "Convert HTML (e.g. scraped pages you are allowed to use) to clean Markdown. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "html": "<h1>Title</h1><p>Hello <b>world</b> <a href='https://example.com'>link</a></p>"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/html-to-text": {
+      "post": {
+        "summary": "HTML to plain text",
+        "description": "Strip tags/scripts/styles and return readable plain text. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "html": "<style>p{}</style><p>Hello<br>world &amp; you</p>"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/text-stats": {
+      "post": {
+        "summary": "Text statistics & readability",
+        "description": "Characters, words, sentences, reading time, language guess (de/en) and readability (Flesch for EN, Amstad for DE). Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "text": "This is a short example. It has two sentences."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/text-clean": {
+      "post": {
+        "summary": "Text cleaner",
+        "description": "Unicode NFC, remove control/zero-width chars, normalise quotes/dashes/whitespace, optional lowercase and line de-duplication. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "text": "  \u201cHello\u201d\u200b  world \u2014  test\n\nline\nline ",
+                "options": {
+                  "ascii_quotes": true,
+                  "dedupe_lines": true
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/token-count": {
+      "post": {
+        "summary": "LLM token counter",
+        "description": "Count tokens with OpenAI tokenizers (o200k_base default, cl100k_base optional) and estimate cost for a given price per million. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "text": "Count my tokens, please.",
+                "encoding": "o200k_base",
+                "price_per_million_usd": 2.5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/date-parse": {
+      "post": {
+        "summary": "Natural-language date parser",
+        "description": "Extract and normalise dates/times from free text (EN/DE, e.g. 'next Friday 3pm', '12. M\u00e4rz 2026') to ISO 8601. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "text": "Meeting next Friday at 3pm, deadline 12.03.2027",
+                "reference": "2026-10-12T09:00:00Z",
+                "locale": "en"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/timezone-convert": {
+      "post": {
+        "summary": "Timezone converter",
+        "description": "Convert an ISO timestamp into one or more IANA time zones with offsets. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "timestamp": "2026-10-12T09:00:00Z",
+                "to": [
+                  "Europe/Berlin",
+                  "America/New_York",
+                  "Asia/Tokyo"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/iban-validate": {
+      "post": {
+        "summary": "IBAN validator",
+        "description": "Check IBAN syntax and checksum (mod 97), return electronic format, country and BBAN. Syntax only, no bank lookup. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "iban": "DE89 3704 0044 0532 0130 00"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/vat-format-check": {
+      "post": {
+        "summary": "VAT ID format check",
+        "description": "Check the syntax of EU/UK/CH/NO VAT identification numbers by country pattern. Format only, no registry (VIES) lookup. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "vat_id": "DE123456789"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/phone-normalize": {
+      "post": {
+        "summary": "Phone number normaliser",
+        "description": "Parse a phone number (with default country) and return E.164, international/national format, type and validity. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "phone": "0170 1234567",
+                "default_country": "DE"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/qr-code": {
+      "post": {
+        "summary": "QR code generator",
+        "description": "Generate a QR code as SVG (and PNG data URL) for any text/URL, with error correction level and size. Price: $0.02 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "text": "https://example.com",
+                "size": 256,
+                "error_correction": "M"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/text-diff": {
+      "post": {
+        "summary": "Text diff",
+        "description": "Compare two texts: unified diff plus word-level changes and a similarity ratio. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "a": "The quick brown fox",
+                "b": "The quick red fox jumps"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/cron-explain": {
+      "post": {
+        "summary": "Cron schedule explainer",
+        "description": "Validate a cron expression and list the next N run times (UTC or a given IANA time zone). Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "expression": "*/15 9-17 * * 1-5",
+                "count": 5,
+                "tz": "Europe/Berlin"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/slugify": {
+      "post": {
+        "summary": "Slug generator",
+        "description": "Create URL-safe slugs (transliterates German umlauts and accents), optional max length. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "text": "Gr\u00f6\u00dfte \u00dcbersicht: Caf\u00e9 & Cr\u00e8me 2026!",
+                "max_length": 60
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/extract-urls": {
+      "post": {
+        "summary": "URL extractor",
+        "description": "Extract unique http(s) URLs from text with domain and position. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "text": "See https://example.com/a and http://test.org/b?x=1, and https://example.com/a again."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    },
+    "/color-convert": {
+      "post": {
+        "summary": "Color converter",
+        "description": "Convert a color between HEX, RGB and HSL and report WCAG contrast against white and black. Price: $0.01 USDC per call (x402).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "color": "#2a78d6"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result"
+          },
+          "400": {
+            "description": "Invalid input (not charged)"
+          },
+          "402": {
+            "description": "Payment required (x402)"
+          }
+        }
+      }
+    }
+  }
+}
